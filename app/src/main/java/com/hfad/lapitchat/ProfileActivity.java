@@ -23,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -195,13 +196,14 @@ public class ProfileActivity extends AppCompatActivity {
                 }
                 //Request received state.
                 if (mCurrent_state.equals("req_received")) {
-                    final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
-                    //final String currentDate = "hello";
-                    mFriendDatabase.child(mCurrent_user.getUid()).child(user_id).setValue(currentDate)
+                    //final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
+                    SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm");
+                    final String currentDateandTime = sdf.format(new Date());
+                    mFriendDatabase.child(mCurrent_user.getUid()).child(user_id).setValue(currentDateandTime)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            mFriendDatabase.child(user_id).child(mCurrent_user.getUid()).setValue(currentDate)
+                            mFriendDatabase.child(user_id).child(mCurrent_user.getUid()).setValue(currentDateandTime)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
