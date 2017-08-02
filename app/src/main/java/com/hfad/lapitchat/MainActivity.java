@@ -11,6 +11,8 @@ import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private TabLayout mTabLayout;
+
+    private DatabaseReference mUserRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
         mToolBar = (Toolbar)findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setTitle("Lapit Chat");
+
+        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
 
         //Tabs
         mViewPager = (ViewPager)findViewById(R.id.main_tabPager);
@@ -46,8 +52,19 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             sendToStart();
+        } else {
+            mUserRef.child("online").setValue(true);
         }
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            mUserRef.child("online").setValue(false);
+        }
     }
 
     private void sendToStart() {

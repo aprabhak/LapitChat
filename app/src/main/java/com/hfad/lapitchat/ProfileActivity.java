@@ -199,34 +199,22 @@ public class ProfileActivity extends AppCompatActivity {
                     //final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
                     SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm");
                     final String currentDateandTime = sdf.format(new Date());
-                    mFriendDatabase.child(mCurrent_user.getUid()).child(user_id).setValue(currentDateandTime)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    Map friendsMap = new HashMap();
+                    friendsMap.put("Friends/" + mCurrent_user.getUid() + "/" + user_id + "/date",currentDateandTime);
+                    friendsMap.put("Friends/" + user_id + "/" + mCurrent_user.getUid() + "/date",currentDateandTime);
+                    friendsMap.put("Friend_req/" + mCurrent_user.getUid() + "/" + user_id, null);
+                    friendsMap.put("Friend_req/" + user_id + "/" + mCurrent_user.getUid(),null);
+
+                    mRootRef.updateChildren(friendsMap, new DatabaseReference.CompletionListener() {
                         @Override
-                        public void onSuccess(Void aVoid) {
-                            mFriendDatabase.child(user_id).child(mCurrent_user.getUid()).setValue(currentDateandTime)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-
-                                    mFriendReqDatabase.child(mCurrent_user.getUid()).child(user_id).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            mFriendReqDatabase.child(user_id).child(mCurrent_user.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    mProfileSendReqBtn.setEnabled(true);
-                                                    mCurrent_state = "friends";
-                                                    mProfileSendReqBtn.setText("Unfriend this person");
-                                                    mDeclineBtn.setVisibility(View.INVISIBLE);
-                                                    mDeclineBtn.setEnabled(false);
-                                                }
-                                            });
-                                        }
-                                    });
-
-                                }
-                            });
-
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if (databaseError == null) {
+                                mProfileSendReqBtn.setEnabled(true);
+                                mCurrent_state = "friends";
+                                mProfileSendReqBtn.setText("Unfriend this person");
+                                mDeclineBtn.setVisibility(View.INVISIBLE);
+                                mDeclineBtn.setEnabled(false);
+                            }
                         }
                     });
                 }
