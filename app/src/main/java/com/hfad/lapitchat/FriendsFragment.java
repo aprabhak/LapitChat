@@ -2,8 +2,11 @@ package com.hfad.lapitchat;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -74,11 +77,11 @@ public class FriendsFragment extends Fragment {
             protected void populateViewHolder(final FriendsViewHolder friendsViewHolder, Friends model, int position) {
                 friendsViewHolder.setDate(model.getDate());
 
-                String list_user_id = getRef(position).getKey();
+                final String list_user_id = getRef(position).getKey();
                 mUsersDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        String userName = dataSnapshot.child("name").getValue().toString();
+                        final String userName = dataSnapshot.child("name").getValue().toString();
                         String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
                         friendsViewHolder.setName(userName);
                         friendsViewHolder.setUserImage(userThumb,getContext());
@@ -86,7 +89,35 @@ public class FriendsFragment extends Fragment {
                             String userOnline = dataSnapshot.child("online").getValue().toString();
                             friendsViewHolder.setUserOnline(userOnline);
                         }
+                        friendsViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                CharSequence options[] = new CharSequence[]{"Open Profile","Send message"};
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setTitle("Select Options");
+                                builder.setItems(options, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //Click event for each item.
+                                        if (which == 0) {
+                                            Intent profileIntent = new Intent(getContext(),ProfileActivity.class);
+                                            profileIntent.putExtra("user_id",list_user_id);
+                                            startActivity(profileIntent);
+                                        }
+                                        if (which == 1) {
+                                            Intent chatIntent = new Intent(getContext(),ChatActivity.class);
+                                            chatIntent.putExtra("user_id",list_user_id);
+                                            chatIntent.putExtra("user_name",userName);
+                                            startActivity(chatIntent);
+                                        }
+                                    }
+                                });
+                                builder.show();
+
+                            }
+                        });
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
 
