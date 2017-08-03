@@ -37,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mToolBar);
         getSupportActionBar().setTitle("Lapit Chat");
 
-        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+        if (mAuth.getCurrentUser() != null) {
+            mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+        }
 
         //Tabs
         mViewPager = (ViewPager)findViewById(R.id.main_tabPager);
